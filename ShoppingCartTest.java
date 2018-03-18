@@ -42,28 +42,35 @@ public class ShoppingCartTest {
 	}
 
 	private static Stream<Arguments> shoppingDataWithTotals() {
-		return Stream
-				.of(Arguments.of(Arrays.asList(APPLE), APPLE_PRICE), Arguments.of(Arrays.asList(ORANGE), ORANGE_PRICE),
-						Arguments.of(Arrays.asList(APPLE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE, APPLE,
-								ORANGE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE),
-								Double.valueOf(7.45)),
-						Arguments.of(Arrays.asList(), 0.00), Arguments.of(null, 0.00));
+		return Stream.of(Arguments.of(Arrays.asList(APPLE), APPLE_PRICE),
+				Arguments.of(Arrays.asList(APPLE, APPLE), APPLE_PRICE),
+				Arguments.of(Arrays.asList(ORANGE), ORANGE_PRICE),
+				Arguments.of(Arrays.asList(ORANGE, ORANGE), new Double(0.50)),
+				Arguments.of(Arrays.asList(ORANGE, ORANGE, ORANGE), new Double(0.50)),
+				Arguments.of(
+						Arrays.asList(APPLE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE,
+								ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE),
+						Double.valueOf(4.65)),
+				Arguments.of(Arrays.asList(), 0.00), Arguments.of(null, 0.00));
 	}
 
 	@ParameterizedTest
 	@MethodSource("shoppingDataForReport")
-	void tesFullReport(List<String> shoppingList, String expectedReport) {
+	void testFullReport(List<String> shoppingList, String expectedReport) {
 		ShoppingCart.fullReport(shoppingList);
 		assertTrue(outContent.toString().contains(expectedReport));
 	}
 
 	private static Stream<Arguments> shoppingDataForReport() {
 		return Stream.of(Arguments.of(Arrays.asList(APPLE), "Total Cost £0.60"),
+				Arguments.of(Arrays.asList(APPLE, APPLE), "Total Cost £0.60"),
 				Arguments.of(Arrays.asList(ORANGE), "Total Cost £0.25"),
+				Arguments.of(Arrays.asList(ORANGE, ORANGE), "Total Cost £0.50"),
+				Arguments.of(Arrays.asList(ORANGE, ORANGE, ORANGE), "Total Cost £0.50"),
 				Arguments.of(
 						Arrays.asList(APPLE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE,
 								ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE),
-						"Total Cost £7.45"),
+						"Total Cost £4.65"),
 				Arguments.of(Arrays.asList(), "Total Cost £0.00"), Arguments.of(null, "Total Cost £0.00"),
 				Arguments.of(Arrays.asList(PLUM), "Not all items stocked"));
 	}
