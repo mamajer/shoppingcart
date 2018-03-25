@@ -1,5 +1,6 @@
 import static java.lang.System.out;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,11 +15,11 @@ public class ShoppingCart {
 	static String ORANGE = "Orange";
 	static String PLUM = "Plum";
 
-	public static Map<String, Double> prices = new HashMap<>();
+	public static Map<String, Integer> prices = new HashMap<>();
 
 	static {
-		prices.put(APPLE, 0.60);
-		prices.put(ORANGE, 0.25);
+		prices.put(APPLE, 60);
+		prices.put(ORANGE, 25);
 	}
 
 	static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("Total Cost £###,###,##0.00 \n");
@@ -50,14 +51,14 @@ public class ShoppingCart {
 
 	}
 
-	private static Double getTotalFromList(List<ProductInformation> shoppingList) {
+	private static BigDecimal getTotalFromList(List<ProductInformation> shoppingList) {
 
-		return shoppingList.stream().collect(Collectors.summingDouble(o -> o.total));
+		return ShoppingCart.convertIntToBigDecimal(shoppingList.stream().collect(Collectors.summingInt(o -> o.total)));
 	}
 
-	public static Double getTotal(List<String> shoppingList) {
+	public static BigDecimal getTotal(List<String> shoppingList) {
 		if (shoppingList == null || shoppingList.isEmpty()) {
-			return new Double(0.00);
+			return ShoppingCart.convertIntToBigDecimal(0);
 		} else if (!(prices.keySet().containsAll(shoppingList))) {
 			throw new IllegalArgumentException("Error: Not all items stocked");
 		}
@@ -67,14 +68,19 @@ public class ShoppingCart {
 
 	private static void printShoppingList(List<String> items) {
 		List<ProductInformation> shoppingList = getListOfITems(items);
-		Double overallTotal = getTotalFromList(shoppingList);
+		BigDecimal overallTotal = getTotalFromList(shoppingList);
 		String format = "%-20s%25s%25s%25s%20s%n";
 		System.out.printf(format, "item", "original quantity", "discounted quantity", "per/unit price", "Total");
 		shoppingList.forEach(item -> System.out.printf(format, item.name, item.quantity, item.quantityDiscounted,
-				ITEM_DECIMAL_FORMATTER.format(item.price), ITEM_DECIMAL_FORMATTER.format(item.total)));
+				ITEM_DECIMAL_FORMATTER.format(ShoppingCart.convertIntToBigDecimal(item.price)),
+				ITEM_DECIMAL_FORMATTER.format(ShoppingCart.convertIntToBigDecimal(item.total))));
 
 		out.println(DECIMAL_FORMATTER.format(overallTotal));
 
+	}
+
+	public static BigDecimal convertIntToBigDecimal(Integer i) {
+		return BigDecimal.valueOf(i).movePointLeft(2);
 	}
 
 	static Function<Integer, Integer> getDiscount(String item) {
@@ -102,13 +108,13 @@ public class ShoppingCart {
 
 	static class ProductInformation {
 
-		Double price;
+		Integer price;
 		String name;
 		Integer quantity;
-		Double total;
+		Integer total;
 		Integer quantityDiscounted;
 
-		ProductInformation(Double price, String name, Integer quantity) {
+		ProductInformation(Integer price, String name, Integer quantity) {
 			this.price = price;
 			this.name = name;
 			this.quantity = quantity;

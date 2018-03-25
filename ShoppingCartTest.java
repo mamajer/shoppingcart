@@ -3,6 +3,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -23,9 +24,8 @@ public class ShoppingCartTest {
 	static String APPLE = "Apple";
 	static String ORANGE = "Orange";
 	static String PLUM = "Plum";
-	static Double APPLE_PRICE = 0.6;
-	static Double ORANGE_PRICE = 0.25;
-
+	static BigDecimal APPLE_PRICE = ShoppingCart.convertIntToBigDecimal(60);
+	static BigDecimal ORANGE_PRICE = ShoppingCart.convertIntToBigDecimal(25);
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
@@ -37,7 +37,7 @@ public class ShoppingCartTest {
 
 	@ParameterizedTest
 	@MethodSource("shoppingDataWithTotals")
-	void checkGetTotal(List<String> shoppingList, Double expectedTotal) {
+	void checkGetTotal(List<String> shoppingList, BigDecimal expectedTotal) {
 		assertEquals(expectedTotal, ShoppingCart.getTotal(shoppingList));
 	}
 
@@ -45,13 +45,14 @@ public class ShoppingCartTest {
 		return Stream.of(Arguments.of(Arrays.asList(APPLE), APPLE_PRICE),
 				Arguments.of(Arrays.asList(APPLE, APPLE), APPLE_PRICE),
 				Arguments.of(Arrays.asList(ORANGE), ORANGE_PRICE),
-				Arguments.of(Arrays.asList(ORANGE, ORANGE), new Double(0.50)),
-				Arguments.of(Arrays.asList(ORANGE, ORANGE, ORANGE), new Double(0.50)),
+				Arguments.of(Arrays.asList(ORANGE, ORANGE), ShoppingCart.convertIntToBigDecimal(50)),
+				Arguments.of(Arrays.asList(ORANGE, ORANGE, ORANGE), ShoppingCart.convertIntToBigDecimal(50)),
 				Arguments.of(
 						Arrays.asList(APPLE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE,
 								ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE, APPLE, ORANGE, ORANGE),
-						Double.valueOf(4.65)),
-				Arguments.of(Arrays.asList(), 0.00), Arguments.of(null, 0.00));
+						ShoppingCart.convertIntToBigDecimal(465)),
+				Arguments.of(Arrays.asList(), ShoppingCart.convertIntToBigDecimal(0)),
+				Arguments.of(null, ShoppingCart.convertIntToBigDecimal(0)));
 	}
 
 	@ParameterizedTest
